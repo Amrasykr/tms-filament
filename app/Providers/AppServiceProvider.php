@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Hero;
-use App\Observers\HeroObserver;
-use Illuminate\Support\Facades\Blade;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,5 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Filament::serving(function () {
+            foreach (['admin', 'teacher', 'student'] as $guard) {
+                if (Auth::guard($guard)->check()) {
+                    Auth::shouldUse($guard);
+                    break;
+                }
+            }
+        });
     }
 }

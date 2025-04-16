@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SchedulesTime extends Model
 {
-    protected $table = 'schedules_time';
+    protected $table = 'schedules_times';
 
     protected $fillable = [
         'start_time',

@@ -29,7 +29,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(false)
             ->authGuard('admin')
-            ->middleware(['web', 'auth:admin'])            
             ->colors([
                 'primary' => Color::Slate,
             ])
@@ -41,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'User',
                 'Master Data',
+                'Jadwal',
                 'Blog',
             ])
             ->pages([
@@ -62,12 +62,8 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->databaseNotifications()
             ->authMiddleware([
                 Authenticate::class,
             ]);
-            // ->plugins([
-            //     \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-            // ]);
     }
 }

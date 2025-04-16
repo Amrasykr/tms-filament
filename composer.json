@@ -12,6 +12,7 @@
         "firefly/filament-blog": "^2.0",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "spatie/eloquent-sortable": "^4.4"
     },
     "require-dev": {
