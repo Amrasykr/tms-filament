@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('class_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('set null');
+            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('cascade');
             $table->text('description')->nullable();
             $table->integer('session_number');
             $table->date('session_date');

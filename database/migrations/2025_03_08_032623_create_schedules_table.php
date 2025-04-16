@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('teacher_id')->nullable()->constrained('teachers')->onDelete('set null');
             $table->foreignId('academic_year_id')->nullable()->constrained('academic_years')->onDelete('set null');
             $table->foreignId('schedule_time_id')->nullable()->constrained('schedules_times')->onDelete('set null'); 
+            $table->boolean('is_repeating')->default(false);
+            $table->unsignedInteger('number_of_sessions')->nullable();
             $table->timestamps();
         });
     }

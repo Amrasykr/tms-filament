@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('grades', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->nullable()->constrained('students')->onDelete('set null');
-            $table->foreignId('subject_id')->nullable()->constrained('subjects')->onDelete('set null');
-            $table->foreignId('academic_year_id')->nullable()->constrained('academic_years')->onDelete('set null');
+            $table->foreignId('schedule_id')->nullable()->constrained('schedules')->onDelete('set null');
             $table->decimal('attendance_score', 5, 2)->default(0);
             $table->decimal('task_score', 5, 2)->default(0);
             $table->decimal('midterm_score', 5, 2)->default(0);
