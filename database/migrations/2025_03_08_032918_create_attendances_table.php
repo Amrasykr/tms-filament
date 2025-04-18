@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->nullable()->constrained('students')->onDelete('set null');
             $table->foreignId('class_session_id')->nullable()->constrained('class_sessions')->onDelete('set null');
-            $table->enum('status', ['present', 'absent', 'sick', 'permission']);
+            $table->enum('status', ['present', 'absent', 'sick', 'permission'])->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

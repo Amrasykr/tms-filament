@@ -20,4 +20,9 @@ class ClassSessions extends Model
     {
         return $this->belongsTo(Schedule::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(\App\Models\Attendance::class, 'class_session_id');
+    }    
 }

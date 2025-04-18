@@ -18,6 +18,11 @@ class Schedule extends Model
         'number_of_sessions',
     ];
 
+    public function classSessions()
+    {
+        return $this->hasMany(ClassSessions::class);
+    }
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);
@@ -43,11 +48,6 @@ class Schedule extends Model
         return $this->belongsTo(SchedulesTime::class);
     }
 
-    public function classSessions()
-    {
-        return $this->hasMany(ClassSessions::class);
-    }
-
     protected static function booted()
     {
         static::created(function ($schedule) {
@@ -60,29 +60,41 @@ class Schedule extends Model
     {
         $academicYear = $this->academicYear;
         $scheduleTime = $this->scheduleTime;
-
+    
         if (!$academicYear || !$scheduleTime) {
             return;
         }
-
+    
         $startDate = \Carbon\Carbon::parse($academicYear->start_date);
-        $day = strtolower($scheduleTime->day); // contoh: "monday"
-
-        // Cari hari pertama yang cocok dari start_date academic year
+        $day = strtolower($scheduleTime->day);
+    
         $firstSessionDate = $startDate->copy()->next($day);
         if ($startDate->isSameDay($firstSessionDate)) {
             $firstSessionDate = $startDate;
         }
-
+    
         $sessionCount = $this->is_repeating ? $this->number_of_sessions : 1;
-
+    
+        // Ambil semua murid dari kelas terkait
+        $studentIds = \App\Models\StudentClass::where('class_id', $this->class_id)->pluck('student_id');
+    
         for ($i = 0; $i < $sessionCount; $i++) {
-            \App\Models\ClassSessions::create([
+            $session = \App\Models\ClassSessions::create([
                 'schedule_id' => $this->id,
                 'session_number' => $i + 1,
                 'session_date' => $firstSessionDate->copy()->addWeeks($i)->toDateString(),
                 'status' => 'pending',
             ]);
+    
+            // Buat attendance untuk setiap murid di sesi ini
+            foreach ($studentIds as $studentId) {
+                \App\Models\Attendance::create([
+                    'student_id' => $studentId,
+                    'class_session_id' => $session->id,
+                    'status' => null,
+                    'notes' => null,
+                ]);
+            }
         }
     }
 

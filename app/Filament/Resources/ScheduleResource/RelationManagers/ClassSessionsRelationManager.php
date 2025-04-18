@@ -2,48 +2,110 @@
 
 namespace App\Filament\Resources\ScheduleResource\RelationManagers;
 
-use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Set;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Get;
 
 class ClassSessionsRelationManager extends RelationManager
 {
+    
     protected static string $relationship = 'classSessions';
 
     protected static ?string $recordTitleAttribute = 'session_number';
-
+    
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('session_number')
-                ->label('Nomor Sesi')
-                ->required()
-                ->maxLength(255),
-            Forms\Components\DatePicker::make('session_date')
-                ->label('Tanggal Pelaksanaan')
-                ->required()
-                ->minDate(now())
-                ->placeholder('Pilih Tanggal'),
-            Forms\Components\Select::make('status')
-                ->label('Status')
-                ->required()
-                ->options([
-                    'pending' => 'Pending',
-                    'completed' => 'Completed',
-                ])
-                ->default('pending'),
-            Textarea::make('description')
-                ->label('Deskripsi')
-                ->rows(3)
-                ->maxLength(65535)
-                ->columnSpan(3),
+                TextInput::make('session_number')
+                    ->label('Nomor Sesi')
+                    ->required()
+                    ->maxLength(255),
+                DatePicker::make('session_date')
+                    ->label('Tanggal Pelaksanaan')
+                    ->required()
+                    ->placeholder('Pilih Tanggal'),
+    
+                Select::make('status')
+                    ->label('Status')
+                    ->required()
+                    ->options([
+                        'pending' => 'Pending',
+                        'completed' => 'Completed',
+                    ])
+                    ->live()
+                    ->default('pending'),
+                Textarea::make('description')
+                    ->label('Deskripsi')
+                    ->rows(3)
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
+                Fieldset::make('Daftar Kehadiran')
+                    ->schema([
+                        Repeater::make('attendances')
+                            ->relationship('attendances')
+                            ->schema([
+                                Grid::make(2)->schema([
+                                    Select::make('student_id')
+                                        ->label('Nama Siswa')
+                                        ->options(\App\Models\Student::all()->pluck('name', 'id'))
+                                        ->disabled()
+                                        ->dehydrated(false),
+                
+                                    Hidden::make('status_is_null')->dehydrated(false),
+                
+                                    Select::make('status')
+                                        ->label('Status')
+                                        ->required()
+                                        ->hint(function ($state, $livewire, $get) {
+                                            return $get('status_is_null') ? 'Belum di-set' : null;
+                                        })
+                                        ->hintColor('warning')
+                                        ->afterStateHydrated(function (Set $set, $state) {
+                                            if (is_null($state)) {
+                                                $set('status', 'present');
+                                                $set('status_is_null', true);
+                                            } else {
+                                                $set('status_is_null', false);
+                                            }
+                                        })
+                                        ->options([
+                                            'present' => 'Hadir',
+                                            'absent' => 'Tidak Hadir',
+                                            'sick' => 'Sakit',
+                                            'permission' => 'Izin',
+                                        ]),
+                
+                                    Textarea::make('notes')
+                                        ->label('Catatan')
+                                        ->rows(1)
+                                        ->columnSpan(2),
+                                ]),
+                            ])
+                            ->addable(false)
+                            ->deletable(false)
+                            ->columnSpanFull()
+                            ->disabled(fn (?Model $record) => $record === null),
+                    ])
+                    ->extraAttributes([
+                        'style' => 'max-height: 400px; overflow-y: auto;',
+                    ])
+                    ->hidden(fn (Get $get) => $get('status') === 'pending'),
+                
             ]);
     }
 
@@ -96,3 +158,5 @@ class ClassSessionsRelationManager extends RelationManager
 
     
 }
+
+

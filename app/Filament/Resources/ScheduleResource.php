@@ -43,11 +43,25 @@ class ScheduleResource extends Resource
                 Forms\Components\Select::make('subject_id')
                     ->label('Mata Pelajaran')
                     ->relationship('subject', 'name')
+                    ->searchable()
+                    ->options(function () {
+                        return \App\Models\Subject::all()->mapWithKeys(function ($item) {
+                            return [
+                                $item->id => "{$item->name} - {$item->code}",
+                            ];
+                        });
+                    })
                     ->required(),
                 Forms\Components\Select::make('teacher_id')
                     ->label('Pengajar')
                     ->relationship('teacher', 'name')
                     ->searchable()
+                    ->options(function () {
+                        return \App\Models\Teacher::where(function ($query) {
+                                $query->where('status', 'active');
+                            })
+                            ->pluck('name', 'id');
+                    })
                     ->required(),
                     Forms\Components\Select::make('academic_year_id')
                     ->label('Tahun Ajaran')
