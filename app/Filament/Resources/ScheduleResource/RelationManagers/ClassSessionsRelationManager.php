@@ -26,6 +26,8 @@ class ClassSessionsRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'session_number';
     
+    protected static ?string $title = 'Sesi Kelas';
+
 
     public function form(Form $form): Form
     {

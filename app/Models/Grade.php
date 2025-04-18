@@ -10,7 +10,7 @@ class Grade extends Model
 
     protected $fillable = [
         'student_id',
-        'subject_id',
+        'schedule_id',
         'academic_year_id',
         'attendance_score',
         'task_score',
@@ -31,6 +31,11 @@ class Grade extends Model
     public function academicYear()
     {
         return $this->belongsTo(AcademicYears::class, 'academic_year_id');
+    }
+
+    public function schedule()
+    {
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 
     

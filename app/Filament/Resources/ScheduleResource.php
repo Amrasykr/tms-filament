@@ -158,6 +158,7 @@ class ScheduleResource extends Resource
     {
         return [
             RelationManagers\ClassSessionsRelationManager::class,
+            RelationManagers\GradesRelationManager::class,
         ];
     }
 

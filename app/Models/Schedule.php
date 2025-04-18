@@ -48,6 +48,12 @@ class Schedule extends Model
         return $this->belongsTo(SchedulesTime::class);
     }
 
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+    
+
     protected static function booted()
     {
         static::created(function ($schedule) {
