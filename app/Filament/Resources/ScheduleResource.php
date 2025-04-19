@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -108,11 +109,14 @@ class ScheduleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('class.name')
-                    ->label('Kelas'),
+                    ->label('Kelas')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('subject.name')
-                    ->label('Mata Pelajaran'),
+                    ->label('Mata Pelajaran')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('teacher.name')
-                    ->label('Pengajar'),
+                    ->label('Pengajar')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('academicYear.name')
                     ->label('Tahun Ajaran'),
                 Tables\Columns\TextColumn::make('scheduleTime')
@@ -142,8 +146,13 @@ class ScheduleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('academic_year_id')
+                    ->label('Tahun Ajaran')
+                    ->options(
+                        \App\Models\AcademicYears::orderBy('start_date', 'desc')->pluck('name', 'id')
+                    ),
             ])
+            
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
