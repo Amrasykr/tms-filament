@@ -84,7 +84,44 @@ class ScheduleResource extends Resource
                             });
                         })
                         ->required()
-                        ->searchable(),
+                        ->searchable()
+                        ->rule(function (Forms\Get $get) {
+                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                $scheduleTimeId = $value;
+                                $classId = $get('class_id');
+                                $teacherId = $get('teacher_id');
+                                $academicYearId = $get('academic_year_id');
+                                $recordId = $get('__record')?->id;
+                        
+                                if (!$scheduleTimeId || !$classId || !$teacherId || !$academicYearId) {
+                                    return;
+                                }
+                        
+                                // Cek bentrok kelas dalam tahun ajaran yang sama
+                                $conflictClass = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
+                                    ->where('class_id', $classId)
+                                    ->where('academic_year_id', $academicYearId)
+                                    ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
+                                    ->exists();
+                        
+                                if ($conflictClass) {
+                                    $fail('Kelas ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
+                                    return;
+                                }
+                        
+                                // Cek bentrok guru dalam tahun ajaran yang sama
+                                $conflictTeacher = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
+                                    ->where('teacher_id', $teacherId)
+                                    ->where('academic_year_id', $academicYearId)
+                                    ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
+                                    ->exists();
+                        
+                                if ($conflictTeacher) {
+                                    $fail('Guru ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
+                                }
+                            };
+                        })
+                        ,
                     Forms\Components\Fieldset::make('Sesi Berulang')
                         ->schema([
                             Forms\Components\Toggle::make('is_repeating')
