@@ -58,6 +58,7 @@ class TeacherResource extends Resource
                                 Forms\Components\TextInput::make('email')
                                     ->required()
                                     ->email()
+                                    ->unique(Teacher::class)
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('password')
                                     ->password()

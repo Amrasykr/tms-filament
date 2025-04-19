@@ -32,6 +32,7 @@ class AcademicYearsResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->unique(AcademicYears::class)
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('start_date')
                     ->required(),
