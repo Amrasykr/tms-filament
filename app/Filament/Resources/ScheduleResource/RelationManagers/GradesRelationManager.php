@@ -53,10 +53,14 @@ class GradesRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
+        $count = $this->getRelationship()->count(); 
+
         return $table
             ->recordTitleAttribute('student_id')
+            ->heading('Jumlah Murid : ' . $count)
             ->columns([
-                Tables\Columns\TextColumn::make('student.name'),
+                Tables\Columns\TextColumn::make('student.name')
+                    ->label('Murid'),
                 Tables\Columns\TextColumn::make('attendance_score')
                     ->label('Nilai Kehadiran'),
                 Tables\Columns\TextColumn::make('task_score')
@@ -71,7 +75,7 @@ class GradesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                // Tables\Actions\CreateAction::make(),
                 Tables\Actions\Action::make('generateGrades')
                     ->label('Generate Nilai Dasar')
                     ->icon('heroicon-m-plus-circle')
@@ -108,7 +112,6 @@ class GradesRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
