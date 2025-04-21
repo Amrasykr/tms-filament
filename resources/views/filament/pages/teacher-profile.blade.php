@@ -1,3 +1,4 @@
+{{-- resources/views/filament/pages/admin-profile.blade.php --}}
 <x-filament-panels::page>
     <div class="space-y-6">
         {{ $this->form }}

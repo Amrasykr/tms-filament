@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\AttendanceExport;
 use App\Exports\StudentsExport;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\CustomLoginController;
@@ -20,3 +21,10 @@ Route::post('/logout', [CustomLoginController::class, 'logout'])->name('logout')
 Route::get('/export/teachers', function () {
     return Excel::download(new StudentsExport, 'teachers.xlsx');
 })->middleware('auth:admin');
+
+
+// Route::get('/export/attendances/{schedule}', function ($scheduleId) {
+//     return Excel::download(new AttendanceExport($scheduleId), 'absensi-jadwal-' . $scheduleId . '.xlsx');
+// });
+
+

@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Teacher\Resources;
 
-use App\Filament\Resources\ScheduleResource\Pages;
-use App\Filament\Resources\ScheduleResource\RelationManagers;
+use App\Filament\Teacher\Resources\ScheduleResource\Pages;
+use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers;
+use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\ClassSessionsRelationManager;
+use App\Models\ClassSessions;
 use App\Models\Schedule;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -146,15 +148,14 @@ class ScheduleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('class.name')
                     ->label('Kelas')
-                    ->searchable(),
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('subject.name')
                     ->label('Mata Pelajaran')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('teacher.name')
-                    ->label('Pengajar')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('academicYear.name')
-                    ->label('Tahun Ajaran'),
+                    ->label('Tahun Akademik')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('scheduleTime')
                     ->label('Waktu')
                     ->getStateUsing(function ($record) {
@@ -171,7 +172,10 @@ class ScheduleResource extends Resource
                         $day = $dayMap[$record->scheduleTime->day] ?? $record->scheduleTime->day;
                         return "{$day}, {$record->scheduleTime->start_time} - {$record->scheduleTime->end_time}";
                     }),
-                        
+                Tables\Columns\TextColumn::make('class_sessions_count')
+                    ->counts('classSessions')
+                    ->label('Jumlah Sesi')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -183,12 +187,11 @@ class ScheduleResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('academic_year_id')
-                    ->label('Tahun Ajaran')
-                    ->options(
-                        \App\Models\AcademicYears::orderBy('start_date', 'desc')->pluck('name', 'id')
-                    ),
+                ->label('Tahun Ajaran')
+                ->options(
+                    \App\Models\AcademicYears::orderBy('start_date', 'desc')->pluck('name', 'id')
+                ),
             ])
-            
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -202,8 +205,7 @@ class ScheduleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ClassSessionsRelationManager::class,
-            RelationManagers\GradesRelationManager::class,
+            ClassSessionsRelationManager::class
         ];
     }
 

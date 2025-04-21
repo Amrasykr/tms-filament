@@ -146,7 +146,7 @@ class StudentResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('Export')
-                ->label('Export Teachers')
+                ->label('Export Murid')
                 ->url(fn () => url('/export/teachers'))
                 // ->openUrlInNewTab(),
                 ])

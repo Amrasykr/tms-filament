@@ -1,33 +1,30 @@
 <?php
 
-namespace App\Filament\Resources\ScheduleResource\RelationManagers;
+namespace App\Filament\Teacher\Resources\ScheduleResource\RelationManagers;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Set;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Get;
 
 class ClassSessionsRelationManager extends RelationManager
 {
-    
-    protected static string $relationship = 'classSessions';
+    protected static string $relationship = 'ClassSessions';
 
     protected static ?string $recordTitleAttribute = 'session_number';
     
     protected static ?string $title = 'Sesi Kelas';
-
 
     public function form(Form $form): Form
     {
@@ -113,6 +110,7 @@ class ClassSessionsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
+
         $count = $this->getRelationship()->count(); 
 
         return $table
@@ -143,21 +141,6 @@ class ClassSessionsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-                Tables\Actions\Action::make('rekapAbsensi')
-                ->label('Rekap Absensi')
-                ->icon('heroicon-o-chart-bar')
-                ->action(fn () => null)
-                ->modalHeading('Rekap Absensi')
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Tutup')
-                ->modalWidth('7xl')
-                ->modalContent(function (RelationManager $livewire) {
-                    $schedule = $livewire->getOwnerRecord();
-                    $sessions = $schedule->classSessions()->orderBy('session_number')->get();
-                    $students = $schedule->class->students;
-        
-                    return view('filament.attendance-recap', compact('sessions', 'students', 'schedule'));
-                }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -169,9 +152,4 @@ class ClassSessionsRelationManager extends RelationManager
                 ]),
             ]);
     }
-
-
-    
 }
-
-

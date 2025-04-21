@@ -25,6 +25,7 @@ class ScheduleHistorySeeder extends Seeder
         $scheduleTimes = SchedulesTime::whereIn('day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'])->get();
         $subjects = Subject::all();
         $teachers = Teacher::all();
+        $usedSchedule = [];
 
         foreach ($academicYears as $academicYear) {
             $classes = Classes::where('academic_year_id', $academicYear->id)->get();
@@ -39,7 +40,23 @@ class ScheduleHistorySeeder extends Seeder
                 foreach ($scheduleTimes as $availableTime) {
                     $teacher = $teachers->random();
                     $subject = $subjects->random();
-                    $sessionCount = 3;
+
+                    if (
+                        in_array("{$class->id}_{$availableTime->id}", $usedSchedule) ||
+                        in_array("{$teacher->id}_{$availableTime->id}", $usedSchedule)
+                    ) continue;
+
+                    $sessionCount = 4;
+
+                    $existingSchedule = Schedule::where([
+                        'class_id' => $class->id,
+                        'teacher_id' => $teacher->id,
+                        'subject_id' => $subject->id,
+                        'academic_year_id' => $academicYear->id,
+                        'schedule_time_id' => $availableTime->id,
+                    ])->first();
+
+                    if ($existingSchedule) continue;
 
                     $schedule = Schedule::create([
                         'class_id' => $class->id,
@@ -51,13 +68,21 @@ class ScheduleHistorySeeder extends Seeder
                         'number_of_sessions' => $sessionCount,
                     ]);
 
+                    $usedSchedule[] = "{$class->id}_{$availableTime->id}";
+                    $usedSchedule[] = "{$teacher->id}_{$availableTime->id}";
+
                     $startDate = Carbon::parse($academicYear->start_date)->next(Carbon::parse($availableTime->day)->dayOfWeek);
 
                     for ($i = 1; $i <= $sessionCount; $i++) {
-                        $sessionDate = (clone $startDate)->addWeeks($i - 1);
+                        $sessionDate = (clone $startDate)->copy()->addWeeks($i - 1);
+
+                        if (ClassSessions::where('schedule_id', $schedule->id)->where('session_number', $i)->exists()) {
+                            continue;
+                        }
+
                         $session = ClassSessions::create([
                             'schedule_id' => $schedule->id,
-                            'description' => "Materi sesi $i",
+                            'description' => "Sesi ke-$i",
                             'session_number' => $i,
                             'session_date' => $sessionDate,
                             'status' => 'completed',
@@ -74,14 +99,16 @@ class ScheduleHistorySeeder extends Seeder
                     }
 
                     foreach ($students as $studentId) {
-                        Grade::create([
-                            'student_id' => $studentId,
-                            'schedule_id' => $schedule->id,
-                            'attendance_score' => rand(70, 100),
-                            'task_score' => rand(70, 100),
-                            'midterm_score' => rand(70, 100),
-                            'final_exam_score' => rand(70, 100),
-                        ]);
+                        if (!Grade::where('student_id', $studentId)->where('schedule_id', $schedule->id)->exists()) {
+                            Grade::create([
+                                'student_id' => $studentId,
+                                'schedule_id' => $schedule->id,
+                                'attendance_score' => 100,
+                                'task_score' => 80,
+                                'midterm_score' => 85,
+                                'final_exam_score' => 90,
+                            ]);
+                        }
                     }
                 }
             }

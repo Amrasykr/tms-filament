@@ -30,7 +30,6 @@ class ScheduleSeeder extends Seeder
         $usedSchedule = [];
 
         foreach ($classes as $class) {
-            // Skip kelas tanpa siswa
             $students = DB::table('student_classes')
                 ->where('class_id', $class->id)
                 ->pluck('student_id');
@@ -48,7 +47,6 @@ class ScheduleSeeder extends Seeder
 
                 $sessionCount = 4;
 
-                // Cek apakah schedule untuk kombinasi ini sudah ada
                 $existingSchedule = Schedule::where([
                     'class_id' => $class->id,
                     'teacher_id' => $teacher->id,
@@ -72,13 +70,11 @@ class ScheduleSeeder extends Seeder
                 $usedSchedule[] = "{$class->id}_{$availableTime->id}";
                 $usedSchedule[] = "{$teacher->id}_{$availableTime->id}";
 
-                // Mulai dari hari sesuai schedule time
                 $startDate = Carbon::parse($academicYear->start_date)->next(Carbon::parse($availableTime->day)->dayOfWeek);
 
                 for ($i = 1; $i <= $sessionCount; $i++) {
                     $sessionDate = (clone $startDate)->copy()->addWeeks($i - 1);
 
-                    // Cek apakah session udah pernah ada (misalnya seeder dijalankan ulang)
                     if (ClassSessions::where('schedule_id', $schedule->id)->where('session_number', $i)->exists()) {
                         continue;
                     }
@@ -101,7 +97,6 @@ class ScheduleSeeder extends Seeder
                     }
                 }
 
-                // Cek grade biar gak dobel juga
                 foreach ($students as $studentId) {
                     if (!Grade::where('student_id', $studentId)->where('schedule_id', $schedule->id)->exists()) {
                         Grade::create([

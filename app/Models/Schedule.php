@@ -54,13 +54,13 @@ class Schedule extends Model
     }
     
 
-    protected static function booted()
-    {
-        static::created(function ($schedule) {
-            $schedule->generateClassSessions();
-        });
+    // protected static function booted()
+    // {
+    //     static::created(function ($schedule) {
+    //         $schedule->generateClassSessions();
+    //     });
 
-    }
+    // }
 
     public function generateClassSessions()
     {
