@@ -46,8 +46,8 @@ class AcademicYearsResource extends Resource
                     ->required(),
                 Radio::make('status')
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => 'Aktif',
+                        'inactive' => 'Tidak Aktif',
                     ])
                     ->inline()
                     ->default('active')
@@ -85,8 +85,8 @@ class AcademicYearsResource extends Resource
                         'inactive' => 'danger',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => 'Aktif',
+                        'inactive' => 'Tidak Aktif',
                     })
                     ->badge(),
                 Tables\Columns\TextColumn::make('created_at')

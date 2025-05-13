@@ -34,19 +34,28 @@ class ClassesResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->placeholder('7B 2024/2025')
+                    ->label('Nama Kelas')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('code')
+                    ->label('Kode Kelas')
                     ->required(),
                 Forms\Components\Select::make('academic_year_id')
                     ->relationship(name: 'academicYear', titleAttribute: 'name')
-                    ->label('Academic Year')
+                    ->label('Tahun Akademik')
                     ->required(),
                 Forms\Components\Select::make('teacher_id')
                     ->relationship(
                         name: 'homeroomTeacher',
                         titleAttribute: 'name'
                     )
-                    ->label('Homeroom Teacher')
+                    ->label('Wali Kelas')
+                    ->default(null),
+                Forms\Components\Select::make('major_id')
+                    ->relationship(
+                        name: 'major',
+                        titleAttribute: 'name'
+                    )
+                    ->label('Jurusan')
                     ->default(null),
                 
             ]);
@@ -57,8 +66,12 @@ class ClassesResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
-                ->searchable(),
+                    ->label('Kode')
+                    ->searchable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Kelas')
+                    
                     ->searchable(),
                 Tables\Columns\TextColumn::make('academicYear.status')
                     ->color(fn (string $state): string => match ($state) {
@@ -66,14 +79,23 @@ class ClassesResource extends Resource
                         'inactive' => 'danger',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => 'Aktif',
+                        'inactive' => 'Tidak Aktif',
                     })
                     ->badge()
                     ->label('Status')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('major.name')
+                    ->color(fn (string $state): string => match ($state) {
+                        'IPA' => 'info',
+                        'IPS' => 'primary',
+                    })
+
+                    ->badge()
+                    ->label('Status')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('homeroomTeacher.name')
-                    ->label('Homeroom Teacher')
+                    ->label('Wali Kelas')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -86,14 +108,21 @@ class ClassesResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('academic_year_id')
-                ->label('Status')
-                ->options(fn () => \App\Models\AcademicYears::pluck('status', 'status')->toArray())
-                ->query(function ($query, $state) {
-                    return $query->whereHas('academicYear', function ($query) use ($state) {
-                        $query->where('status', $state);
-                    });
-                })
-                ->default('active'),
+                    ->label('Status')
+                    ->options(fn () => \App\Models\AcademicYears::pluck('status', 'status')->toArray())
+                    ->query(function ($query, $state) {
+                        return $query->whereHas('academicYear', function ($query) use ($state) {
+                            $query->where('status', $state);
+                        });
+                    })
+                    ->default('active'),
+                // SelectFilter::make('major_id')
+                //     ->label('Jurusan')
+                //     ->options(fn () => \App\Models\Major::pluck('name', 'id')->toArray())
+                //     ->query(function ($query, $state) {
+                //         return $query->where('major_id', $state);
+                //     })
+                //     ->placeholder('Pilih Jurusan'),
             
             ])
             ->actions([

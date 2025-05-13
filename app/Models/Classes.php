@@ -27,7 +27,6 @@ class Classes extends Model
         return $this->belongsTo(AcademicYears::class, 'academic_year_id');
     }
 
-
     public function students()
     {
         return $this->belongsToMany(Student::class, 'student_classes', 'class_id', 'student_id');
@@ -36,6 +35,16 @@ class Classes extends Model
     public function studentClasses()
     {
         return $this->hasMany(StudentClass::class, 'class_id');
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class, 'major_id');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'class_id');
     }
     
 }

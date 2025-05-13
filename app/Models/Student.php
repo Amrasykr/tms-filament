@@ -68,6 +68,11 @@ class Student extends Authenticatable implements FilamentUser
     }
 
 
+    public function studentTasks()
+    {
+        return $this->hasMany(StudentTask::class);
+    }
+
     public function currentClass()
     {
         return $this->hasOneThrough(

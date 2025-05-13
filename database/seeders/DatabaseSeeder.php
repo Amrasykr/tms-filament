@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TeacherSeeder::class);
 
         // master data seeder
+        $this->call(MajorSeeder::class);
         $this->call(AcademicYearSeeder::class);
         $this->call(SubjectSeeder::class);
         $this->call(ClassSeeder::class);
@@ -30,5 +31,7 @@ class DatabaseSeeder extends Seeder
         
         // schedule seeder
         $this->call(SchedulesTimeSeeder::class);
+        $this->call(ScheduleSeeder::class);
+
     }
 }
