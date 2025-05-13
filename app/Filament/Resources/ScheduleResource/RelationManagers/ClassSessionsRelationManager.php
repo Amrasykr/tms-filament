@@ -14,7 +14,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Set;
-use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Get;
@@ -60,6 +59,7 @@ class ClassSessionsRelationManager extends RelationManager
                     ->schema([
                         Repeater::make('attendances')
                             ->relationship('attendances')
+                            ->disableLabel()
                             ->schema([
                                 Grid::make(2)->schema([
                                     Select::make('student_id')
@@ -108,7 +108,7 @@ class ClassSessionsRelationManager extends RelationManager
                     ])
                     ->hidden(fn (Get $get) => $get('status') === 'pending'),
                 
-            ]);
+                ]);
     }
 
     public function table(Table $table): Table

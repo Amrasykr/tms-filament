@@ -77,12 +77,12 @@ class GradesRelationManager extends RelationManager
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
                 Tables\Actions\Action::make('generateGrades')
-                    ->label('Generate Nilai Dasar')
+                    ->label('Buat Nilai Dasar')
                     ->icon('heroicon-m-plus-circle')
                     ->requiresConfirmation()
                     ->color('success')
                     ->action(function () {
-                        $schedule = $this->getOwnerRecord(); // record induk: Schedule
+                        $schedule = $this->getOwnerRecord(); 
                         $studentIds = \App\Models\StudentClass::where('class_id', $schedule->class_id)->pluck('student_id');
                     
                         foreach ($studentIds as $studentId) {
@@ -104,7 +104,6 @@ class GradesRelationManager extends RelationManager
                             ->send();
                     })
                     ->hidden(function () {
-                        // Sembunyikan tombol jika sudah ada nilai untuk schedule_id
                         $schedule = $this->getOwnerRecord();
                         return \App\Models\Grade::where('schedule_id', $schedule->id)->exists();
                     })

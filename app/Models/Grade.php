@@ -38,5 +38,18 @@ class Grade extends Model
         return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 
+    public function studentTasks()
+    {
+        return $this->hasMany(StudentTask::class, 'student_id', 'student_id')
+            ->whereHas('task', function ($query) {
+                $query->where('schedule_id', $this->schedule_id);
+            });
+    }
+
+    public function recalculateTaskScore()
+    {
+        $averageScore = $this->studentTasks()->avg('score') ?? 0;
+        $this->update(['task_score' => $averageScore]);
+    }
     
 }

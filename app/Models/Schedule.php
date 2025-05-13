@@ -52,15 +52,19 @@ class Schedule extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
     
 
-    // protected static function booted()
-    // {
-    //     static::created(function ($schedule) {
-    //         $schedule->generateClassSessions();
-    //     });
-
-    // }
+    protected static function booted()
+    {
+        static::created(function ($schedule) {
+            $schedule->generateClassSessions();
+        });
+    }
 
     public function generateClassSessions()
     {

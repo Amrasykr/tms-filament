@@ -5,6 +5,7 @@ namespace App\Filament\Teacher\Resources;
 use App\Filament\Teacher\Resources\ScheduleResource\Pages;
 use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers;
 use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\ClassSessionsRelationManager;
+use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\GradesRelationManager;
 use App\Models\ClassSessions;
 use App\Models\Schedule;
 use Filament\Forms;
@@ -205,7 +206,8 @@ class ScheduleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ClassSessionsRelationManager::class
+            ClassSessionsRelationManager::class,
+            GradesRelationManager::class
         ];
     }
 
