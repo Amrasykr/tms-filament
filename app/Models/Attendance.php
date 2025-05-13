@@ -26,5 +26,30 @@ class Attendance extends Model
     }    
 
 
+     protected static function booted()
+    {
+        static::saved(function (Attendance $attendance) {
+            // Update attendance score di tabel grade
+            Grade::updateOrCreate(
+                [
+                    'student_id' => $attendance->student_id,
+                    'schedule_id' => $attendance->classSession->schedule_id,
+                ],
+                []
+            )->updateAttendanceScore();
+        });
+
+        static::deleted(function (Attendance $attendance) {
+            // Update attendance score di tabel grade
+            Grade::updateOrCreate(
+                [
+                    'student_id' => $attendance->student_id,
+                    'schedule_id' => $attendance->classSession->schedule_id,
+                ],
+                []
+            )->updateAttendanceScore();
+        });
+    }
+
     
 }

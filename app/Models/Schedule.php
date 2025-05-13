@@ -96,15 +96,15 @@ class Schedule extends Model
                 'status' => 'pending',
             ]);
     
-            // Buat attendance untuk setiap murid di sesi ini
-            foreach ($studentIds as $studentId) {
-                \App\Models\Attendance::create([
-                    'student_id' => $studentId,
-                    'class_session_id' => $session->id,
-                    'status' => null,
-                    'notes' => null,
-                ]);
-            }
+            // // Buat attendance untuk setiap murid di sesi ini
+            // foreach ($studentIds as $studentId) {
+            //     \App\Models\Attendance::create([
+            //         'student_id' => $studentId,
+            //         'class_session_id' => $session->id,
+            //         'status' => null,
+            //         'notes' => null,
+            //     ]);
+            // }
         }
     }
 
