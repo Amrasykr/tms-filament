@@ -17,6 +17,7 @@ class Grade extends Model
         'task_score',
         'midterm_score',
         'final_exam_score',
+        'final_score',
     ];
 
 

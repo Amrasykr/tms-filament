@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('task_score', 5, 2)->default(0);
             $table->decimal('midterm_score', 5, 2)->default(0);
             $table->decimal('final_exam_score', 5, 2)->default(0);
+            $table->decimal('final_score', 5, 2)->default(0);
             $table->timestamps();
         });
     }

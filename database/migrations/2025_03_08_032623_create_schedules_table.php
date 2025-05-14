@@ -20,6 +20,10 @@ return new class extends Migration
             $table->foreignId('schedule_time_id')->nullable()->constrained('schedules_times')->onDelete('set null'); 
             $table->boolean('is_repeating')->default(false);
             $table->unsignedInteger('number_of_sessions')->nullable();
+            $table->decimal('attendance_weight', 5, 2)->default(25); 
+            $table->decimal('task_weight', 5, 2)->default(25); 
+            $table->decimal('midterm_weight', 5, 2)->default(25); 
+            $table->decimal('final_exam_weight', 5, 2)->default(25); 
             $table->timestamps();
         });
     }
