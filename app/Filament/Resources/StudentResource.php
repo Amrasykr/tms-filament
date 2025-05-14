@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\StudentExporter;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
+use App\Filament\Resources\StudentResource\RelationManagers\SchedulesRelationManager;
+use App\Models\Schedule;
 use App\Models\Student;
 use Filament\Actions\ExportAction;
 use Filament\Forms;
@@ -164,7 +166,7 @@ class StudentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SchedulesRelationManager::class,
         ];
     }
 
