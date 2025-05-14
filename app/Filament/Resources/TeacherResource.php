@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeacherResource\Pages;
+use App\Filament\Resources\TeacherResourcesResource\RelationManagers\SchedulesRelationManager;
+use App\Models\Schedule;
 use App\Models\Teacher;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
@@ -160,7 +162,7 @@ class TeacherResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SchedulesRelationManager::class,
         ];
     }
 

@@ -16,6 +16,10 @@ class Schedule extends Model
         'schedule_time_id',
         'is_repeating',
         'number_of_sessions',
+        'attendance_weight',
+        'task_weight',
+        'midterm_weight',
+        'final_exam_weight',
     ];
 
     public function classSessions()

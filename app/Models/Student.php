@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Student extends Authenticatable implements FilamentUser
 {
@@ -87,4 +88,16 @@ class Student extends Authenticatable implements FilamentUser
         });
     }
     
+
+    public function schedules(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Schedule::class,
+            StudentClass::class,
+            'student_id',    // Foreign key on student_classes table
+            'class_id',      // Foreign key on schedules table
+            'id',            // Local key on students table
+            'class_id'       // Local key on student_classes table
+        );
+    }
 }

@@ -27,7 +27,7 @@ class ScheduleResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+ public static function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -41,6 +41,7 @@ class ScheduleResource extends Resource
                     })
                     ->searchable()
                     ->required(),
+
                 Forms\Components\Select::make('subject_id')
                     ->label('Mata Pelajaran')
                     ->relationship('subject', 'name')
@@ -53,92 +54,139 @@ class ScheduleResource extends Resource
                         });
                     })
                     ->required(),
+
                 Forms\Components\Select::make('teacher_id')
                     ->label('Pengajar')
                     ->relationship('teacher', 'name')
                     ->searchable()
                     ->options(function () {
-                        return \App\Models\Teacher::where(function ($query) {
-                                $query->where('status', 'active');
-                            })
-                            ->pluck('name', 'id');
+                        return \App\Models\Teacher::where('status', 'active')->pluck('name', 'id');
                     })
                     ->required(),
-                    Forms\Components\Select::make('academic_year_id')
+
+                Forms\Components\Select::make('academic_year_id')
                     ->label('Tahun Ajaran')
                     ->options(function () {
-                        return \App\Models\AcademicYears::where('status', 'active')
-                            ->pluck('name', 'id');
+                        return \App\Models\AcademicYears::where('status', 'active')->pluck('name', 'id');
                     })
                     ->default(function () {
                         return \App\Models\AcademicYears::where('status', 'active')->value('id');
                     })
                     ->required(),         
-                    Forms\Components\Select::make('schedule_time_id')
-                        ->label('Waktu Pembelajaran')
-                        ->options(function () {
-                            return \App\Models\SchedulesTime::all()->mapWithKeys(function ($item) {
-                                return [
-                                    $item->id => "{$item->day}, {$item->start_time} - {$item->end_time}",
-                                ];
-                            });
-                        })
-                        ->required()
-                        ->searchable()
-                        ->rule(function (Forms\Get $get) {
-                            return function (string $attribute, $value, \Closure $fail) use ($get) {
-                                $scheduleTimeId = $value;
-                                $classId = $get('class_id');
-                                $teacherId = $get('teacher_id');
-                                $academicYearId = $get('academic_year_id');
-                                $recordId = $get('__record')?->id;
-                        
-                                if (!$scheduleTimeId || !$classId || !$teacherId || !$academicYearId) {
-                                    return;
-                                }
-                        
-                                $conflictClass = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
-                                    ->where('class_id', $classId)
-                                    ->where('academic_year_id', $academicYearId)
-                                    ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
-                                    ->exists();
-                        
-                                if ($conflictClass) {
-                                    $fail('Kelas ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
-                                    return;
-                                }
-                        
-                                // Cek bentrok guru dalam tahun ajaran yang sama
-                                $conflictTeacher = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
-                                    ->where('teacher_id', $teacherId)
-                                    ->where('academic_year_id', $academicYearId)
-                                    ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
-                                    ->exists();
-                        
-                                if ($conflictTeacher) {
-                                    $fail('Guru ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
-                                }
-                            };
-                        })
-                        ,
-                    Forms\Components\Fieldset::make('Sesi Berulang')
-                        ->schema([
-                            Forms\Components\Toggle::make('is_repeating')
-                                ->label('Aktifkan sesi berulang?')
-                                ->live()
-                                ->disabled(fn (?Model $record) => filled($record))
-                                ->visible(fn ($get) => !$get('record') || !$get('record')->exists),
-                            Forms\Components\TextInput::make('number_of_sessions')
-                                ->label('Jumlah sesi')
-                                ->numeric()
-                                ->visible(fn ($get) => $get('is_repeating') && (!$get('record') || !$get('record')->exists))
-                                ->required(fn (Forms\Get $get) => $get('is_repeating'))
-                                ->disabled(fn (?Model $record) => filled($record))
-                        ])
-                        ->hidden(fn (?Model $record) => $record && $record->exists)
+
+                Forms\Components\Select::make('schedule_time_id')
+                    ->label('Waktu Pembelajaran')
+                    ->options(function () {
+                        return \App\Models\SchedulesTime::all()->mapWithKeys(function ($item) {
+                            return [
+                                $item->id => "{$item->day}, {$item->start_time} - {$item->end_time}",
+                            ];
+                        });
+                    })
+                    ->required()
+                    ->searchable(),
+                    // ->rule(function (Forms\Get $get) {
+                    //     return function (string $attribute, $value, \Closure $fail) use ($get) {
+                    //         $scheduleTimeId = $value;
+                    //         $classId = $get('class_id');
+                    //         $teacherId = $get('teacher_id');
+                    //         $academicYearId = $get('academic_year_id');
+                    //         $recordId = $get('__record')?->id;
                     
+                    //         if (!$scheduleTimeId || !$classId || !$teacherId || !$academicYearId) {
+                    //             return;
+                    //         }
+                    
+                    //         $conflictClass = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
+                    //             ->where('class_id', $classId)
+                    //             ->where('academic_year_id', $academicYearId)
+                    //             ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
+                    //             ->exists();
+                    
+                    //         if ($conflictClass) {
+                    //             $fail('Kelas ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
+                    //             return;
+                    //         }
+                    
+                    //         $conflictTeacher = \App\Models\Schedule::where('schedule_time_id', $scheduleTimeId)
+                    //             ->where('teacher_id', $teacherId)
+                    //             ->where('academic_year_id', $academicYearId)
+                    //             ->when($recordId, fn ($query) => $query->where('id', '!=', $recordId))
+                    //             ->exists();
+                    
+                    //         if ($conflictTeacher) {
+                    //             $fail('Guru ini sudah memiliki jadwal di waktu tersebut untuk tahun ajaran ini.');
+                    //         }
+                    //     };
+                    // }),
+
+                Forms\Components\Fieldset::make('Sesi Berulang')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_repeating')
+                            ->label('Aktifkan sesi berulang?')
+                            ->live()
+                            ->disabled(fn (?Model $record) => filled($record))
+                            ->visible(fn ($get) => !$get('record') || !$get('record')->exists),
+                        
+                        Forms\Components\TextInput::make('number_of_sessions')
+                            ->label('Jumlah sesi')
+                            ->numeric()
+                            ->visible(fn ($get) => $get('is_repeating') && (!$get('record') || !$get('record')->exists))
+                            ->required(fn (Forms\Get $get) => $get('is_repeating'))
+                            ->disabled(fn (?Model $record) => filled($record))
+                    ])
+                    ->hidden(fn (?Model $record) => $record && $record->exists),
+
+                Forms\Components\Fieldset::make('Bobot Penilaian')
+                    ->schema([
+                        Forms\Components\TextInput::make('attendance_weight')
+                            ->label('Bobot Kehadiran (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(25)
+                            ->required(),
+                            
+                        Forms\Components\TextInput::make('task_weight')
+                            ->label('Bobot Tugas (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(25)
+                            ->required(),
+                        
+                        Forms\Components\TextInput::make('midterm_weight')
+                            ->label('Bobot UTS (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(25)
+                            ->required(),
+                        
+                        Forms\Components\TextInput::make('final_exam_weight')
+                            ->label('Bobot UAS (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->default(25)
+                            ->required(),
+                        
+                        Forms\Components\Placeholder::make('weight_total')
+                            ->label('Total Bobot')
+                            ->content(fn (Forms\Get $get) => 
+                                ($get('attendance_weight') ?? 0) + 
+                                ($get('task_weight') ?? 0) + 
+                                ($get('midterm_weight') ?? 0) + 
+                                ($get('final_exam_weight') ?? 0) . '%'
+                            )
+                            ->reactive()
+                            ->disableLabel(),
+                    ])
+                    ->columns(2)
+                    ->label('Bobot Penilaian'),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {
@@ -154,9 +202,11 @@ class ScheduleResource extends Resource
                     ->label('Pengajar')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('academicYear.name')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Tahun Ajaran'),
                 Tables\Columns\TextColumn::make('scheduleTime')
                     ->label('Waktu')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->getStateUsing(function ($record) {
                         $dayMap = [
                             'Monday' => 'Senin',
@@ -171,7 +221,20 @@ class ScheduleResource extends Resource
                         $day = $dayMap[$record->scheduleTime->day] ?? $record->scheduleTime->day;
                         return "{$day}, {$record->scheduleTime->start_time} - {$record->scheduleTime->end_time}";
                     }),
-                        
+                Tables\Columns\TextColumn::make('progress')
+                    ->label('Progres')
+                    ->getStateUsing(function ($record) {
+                        $totalSessions = $record->classSessions()->count();
+                        $completedSessions = $record->classSessions()->where('status', 'completed')->count();
+
+                        if ($totalSessions === 0) {
+                            return '0% (0/0)';
+                        }
+
+                        $progress = round(($completedSessions / $totalSessions) * 100, 2);
+                        return "{$progress}% ({$completedSessions}/{$totalSessions})";
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

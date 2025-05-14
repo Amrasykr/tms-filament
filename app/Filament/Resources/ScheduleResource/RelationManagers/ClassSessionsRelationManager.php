@@ -144,19 +144,35 @@ class ClassSessionsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\Action::make('rekapAbsensi')
-                ->label('Rekap Absensi')
-                ->icon('heroicon-o-chart-bar')
-                ->action(fn () => null)
-                ->modalHeading('Rekap Absensi')
-                ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Tutup')
-                ->modalWidth('7xl')
-                ->modalContent(function (RelationManager $livewire) {
-                    $schedule = $livewire->getOwnerRecord();
-                    $sessions = $schedule->classSessions()->orderBy('session_number')->get();
-                    $students = $schedule->class->students;
-        
-                    return view('filament.attendance-recap', compact('sessions', 'students', 'schedule'));
+                    ->label('Rekap Absensi')
+                    ->icon('heroicon-o-chart-bar')
+                    ->action(fn () => null)
+                    ->modalHeading('Rekap Absensi')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalWidth('7xl')
+                    ->modalContent(function (RelationManager $livewire) {
+                        $schedule = $livewire->getOwnerRecord();
+                        $sessions = $schedule->classSessions()->orderBy('session_number')->get();
+                        $students = $schedule->class->students;
+            
+                        return view('filament.attendance-recap', compact('sessions', 'students', 'schedule'));
+                    }),
+
+                Tables\Actions\Action::make('exportAbsensi')
+                    ->label('Export Absensi')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->action(function (RelationManager $livewire) {
+                        $schedule = $livewire->getOwnerRecord();
+                        $className = preg_replace('/[\/\\\\]/', '-', $schedule->class->name);
+                        $subjectName = preg_replace('/[\/\\\\]/', '-', $schedule->subject->name);
+                        $fileName = "Absensi_{$className}_{$subjectName}.xlsx";
+
+                        return \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\ScheduleAttendanceExport($schedule),
+                            $fileName
+                        );
                 }),
             ])
             ->actions([
