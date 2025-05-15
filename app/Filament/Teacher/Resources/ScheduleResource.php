@@ -6,6 +6,7 @@ use App\Filament\Teacher\Resources\ScheduleResource\Pages;
 use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers;
 use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\ClassSessionsRelationManager;
 use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\GradesRelationManager;
+use App\Filament\Teacher\Resources\ScheduleResource\RelationManagers\TasksRelationManager;
 use App\Models\ClassSessions;
 use App\Models\Schedule;
 use Filament\Forms;
@@ -163,7 +164,9 @@ class ScheduleResource extends Resource
     {
         return [
             ClassSessionsRelationManager::class,
-            GradesRelationManager::class
+            GradesRelationManager::class,
+            TasksRelationManager::class,
+
         ];
     }
 
