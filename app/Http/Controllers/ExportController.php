@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Exports\ScheduleAttendanceExport;
 use App\Exports\ScheduleGradeExport;
+use App\Exports\StudentGradesExport;
 use App\Models\Schedule;
+use App\Models\Student;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -22,5 +24,11 @@ class ExportController extends Controller
         $schedule = Schedule::findOrFail($scheduleId);
         $fileName = 'Nilai_' . preg_replace('/[\/\\]/', '-', $schedule->class->name) . '.xlsx';
         return Excel::download(new ScheduleGradeExport($schedule), $fileName);
+    }
+
+    public function exportGradesPerStudent(Student $student, $academic_year)
+    {
+        $fileName = 'Nilai' . $student->name . '_' . now()->format('YmdHis') . '.xlsx';
+        return Excel::download(new StudentGradesExport($student->id, $academic_year), $fileName);
     }
 }

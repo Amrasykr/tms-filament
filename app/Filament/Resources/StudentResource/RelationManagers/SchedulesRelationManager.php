@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources\StudentResource\RelationManagers;
 
+use App\Models\AcademicYears;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+
 
 class SchedulesRelationManager extends RelationManager
 {
@@ -65,6 +66,29 @@ class SchedulesRelationManager extends RelationManager
             ])
             ->headerActions([
                 // Tables\Actions\CreateAction::make(),
+                Action::make('exportGrades')
+                    ->label('Export Nilai Keseluruhan')
+                    ->button()
+                    ->form([
+                        Forms\Components\Select::make('academic_year_id')
+                            ->label('Tahun Akademik')
+                            ->options(AcademicYears::pluck('name', 'id'))
+                            ->required(),
+                    ])
+                    ->action(function (array $data, $record) {
+                        $studentId = $this->ownerRecord->id;
+                        $academicYearId = $data['academic_year_id'];
+
+                        // Redirect ke route untuk melakukan export
+                        return redirect()->route('students.export-grades', [
+                            'student' => $studentId,
+                            'academic_year' => $academicYearId,
+                        ]);
+                    })
+                    ->button()
+                    ->color('primary')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->requiresConfirmation(),
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
