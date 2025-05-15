@@ -184,7 +184,7 @@ class ScheduleResource extends Resource
                     ])
                     ->columns(2)
                     ->label('Bobot Penilaian'),
-            ]);
+                ]);
     }
 
 

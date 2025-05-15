@@ -16,4 +16,15 @@ class EditSchedule extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getBreadcrumbs(): array
+    {
+        $schedule = $this->getRecord();
+
+        return [
+            ScheduleResource::getUrl() => 'Jadwal',
+            '' =>  ($schedule->subject->name   ?? 'Tanpa Nama'),
+        ];
+    }
+
 }
